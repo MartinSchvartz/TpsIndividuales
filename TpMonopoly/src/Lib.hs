@@ -15,54 +15,61 @@ data Propiedad = UnaPropiedad {
     } deriving(Eq,Show)
 
 carolina :: Jugador
-carolina = Jugador{nombre="Carolina", dinero=100, tactica="Accionista",propiedadesCompradas=[libertador], acciones=[pasarPorElBanco, pagarAAccionistas,gritar]}
+carolina = Jugador{nombre="Carolina", dinero=500, tactica="Accionista",propiedadesCompradas=[libertador], acciones=[pasarPorElBanco, pagarAAccionistas,gritar]}
 manuel :: Jugador
-manuel = Jugador{nombre="Manuel", dinero=300, tactica="Oferente singular",propiedadesCompradas=[], acciones=[pasarPorElBanco, enojarse]}
+manuel = Jugador{nombre="Manuel", dinero=200, tactica="Oferente singular",propiedadesCompradas=[], acciones=[pasarPorElBanco, enojarse]}
 
 libertador:: Propiedad
 libertador =  UnaPropiedad {titulo = "Av Libertador 4515", precio = 100}
 palermo:: Propiedad
-palermo =  UnaPropiedad {titulo = "Av Scalabrini Ortiz 4201", precio = 300}
+palermo =  UnaPropiedad {titulo = "Av Scalabrini Ortiz 4201", precio = 50}
+
+mapDinero :: (Int -> Int) -> Jugador ->Jugador
+mapDinero unaFuncion unJugador = unJugador {dinero = unaFuncion . dinero $ unJugador }
+mapPropiedadesCompradas :: ([Propiedad] -> [Propiedad]) -> Jugador ->Jugador
+mapPropiedadesCompradas unaFuncion unJugador = unJugador {propiedadesCompradas = unaFuncion . propiedadesCompradas $ unJugador }
+
 
 
 pasarPorElBanco :: Accion
-pasarPorElBanco unJugador =  unJugador  {dinero = dinero unJugador + 40, tactica = "Comprador compulsivo"}
+pasarPorElBanco unJugador = mapDinero (+40) unJugador  {tactica = "Comprador compulsivo"}
 
 enojarse :: Accion
-enojarse unJugador = unJugador  {dinero = dinero unJugador + 50, acciones = acciones unJugador ++ [gritar]}
+enojarse unJugador = mapDinero (+50) unJugador  { acciones = acciones unJugador ++ [gritar]}
 
 gritar :: Accion
 gritar unJugador = unJugador {nombre = "AHHHH" ++ nombre unJugador}
 
 
-compararTactica :: Jugador->  Bool
-compararTactica unJugador = tactica unJugador == "Accionista" || tactica unJugador ==  "Oferente singular"
+esPropiedadGanadora :: Jugador->  Bool
+esPropiedadGanadora unJugador = tactica unJugador == "Accionista" || tactica unJugador ==  "Oferente singular"
 
 subastar :: Propiedad ->  Jugador -> Jugador
 subastar unaPropiedad unJugador
-    | compararTactica unJugador && dinero unJugador >= precio unaPropiedad = unJugador {propiedadesCompradas=propiedadesCompradas unJugador ++ [unaPropiedad], dinero =  dinero unJugador -  precio unaPropiedad}
+    | esPropiedadGanadora unJugador && dinero unJugador >= precio unaPropiedad = mapPropiedadesCompradas (++ [unaPropiedad]) (mapDinero (subtract (precio unaPropiedad)) unJugador)
     | otherwise = unJugador
 
-propiedadBarata :: Propiedad -> Int
-propiedadBarata unaPropiedad
+precioAlquilerPropiedad :: Propiedad -> Int
+precioAlquilerPropiedad unaPropiedad
  | precio unaPropiedad < 150 = 10
  | otherwise = 20
 
 
 listaDeAlquileres :: Jugador -> [Int]
-listaDeAlquileres unJugador = map propiedadBarata (propiedadesCompradas unJugador)
+listaDeAlquileres unJugador = map precioAlquilerPropiedad (propiedadesCompradas unJugador)
 
 cobrarAlquileres :: Accion
-cobrarAlquileres unJugador  = unJugador {dinero = dinero unJugador + sum (listaDeAlquileres unJugador)}
+cobrarAlquileres unJugador  = mapDinero (+ sum (listaDeAlquileres unJugador)) unJugador
 
 pagarAAccionistas :: Accion
 pagarAAccionistas unJugador
-    | tactica unJugador == "Accionista" =  unJugador{dinero =  dinero unJugador + 200}
+    | tactica unJugador == "Accionista" = mapDinero (+200) unJugador
     | otherwise = unJugador{dinero =  dinero unJugador - 100}
 
 
 sumarleBerrinche :: Jugador -> Jugador
-sumarleBerrinche unJugador = unJugador {dinero = dinero unJugador + 10}
+sumarleBerrinche = mapDinero (+10)
+
 gritarYSumar :: Jugador -> Jugador
 gritarYSumar = gritar . sumarleBerrinche
 
@@ -85,8 +92,13 @@ ganador
     | dinero (ultimaRonda manuel) == dinero (ultimaRonda carolina) = "EMPATARON VIEJO QUE ABURRIDO"
 
 -- NO vi que habia q hacer juego final por eso hice ganador asi q la dejo y hago abajo juego final xd
+
+
+dineroEnUltimaRonda :: Jugador -> Int
+dineroEnUltimaRonda = dinero . ultimaRonda
+
 juegoFinal :: Jugador -> Jugador -> Jugador
 juegoFinal jugador1 jugador2
-    | dinero (ultimaRonda jugador1) >= dinero (ultimaRonda jugador2) = jugador1
-    | dinero (ultimaRonda jugador1) < dinero (ultimaRonda jugador2) = jugador2
-    
+    | dineroEnUltimaRonda jugador1 >= dineroEnUltimaRonda jugador2 = jugador1
+    | otherwise = jugador2
+
