@@ -48,3 +48,4 @@ Quien = mayordomo.
 charles odia a tia Agatha.
 -Todos los odiadores y sus odiados se puede responder con la consulta odiadorOdiado(Odiador,Odiado). Lo cual nos dice quien odia a quien.
 -Para saber si el mayordomo odia a alguien simplemente consultamos mayordomoOdia(_). lo cual nos dice true ya que odia a charles
+*/
