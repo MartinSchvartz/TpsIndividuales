@@ -3,39 +3,27 @@ vivenEnLaMansionDreadbury(tiaAgatha).
 vivenEnLaMansionDreadbury(charles).
 vivenEnLaMansionDreadbury(mayordomo).
 
-agathaOdia(Alguien) :-
-    vivenEnLaMansionDreadbury(Alguien),
-    Alguien \= mayordomo,
-    Alguien \= tiaAgatha.
-mayordomoOdia(Alguien) :-
-    vivenEnLaMansionDreadbury(Alguien),
-    Alguien \= mayordomo,
-    Alguien \= tiaAgatha.
+esMasRicoQue(tiaAgatha,AlguienMenosRico):-
+    not(odia(mayordomo,AlguienMenosRico)),
+    vivenEnLaMansionDreadbury(AlguienMenosRico).
 
-charlesOdia(Alguien):-
-    vivenEnLaMansionDreadbury(Alguien),
-    not(agathaOdia(Alguien)).
-    
-esMasRicoQueTiaAgatha(Alguien):-
-    not(mayordomoOdia(Alguien)),
-    vivenEnLaMansionDreadbury(Alguien).
-quienOdiaAAgatha(Odiador):-
-    odiadorOdiado(Odiador,tiaAgatha).
-
-odiadorOdiado(tiaAgatha,charles).
-odiadorOdiado(mayordomo,charles).
-odiadorOdiado(charles,mayordomo).
-odiadorOdiado(charles,tiaAgatha).
-
-alguienOdiaA(Odiado):-
-    odiadorOdiado(_,Odiado).
-
-
+odia(tiaAgatha, Odiado):-
+    vivenEnLaMansionDreadbury(Odiado),
+    Odiado \= mayordomo,
+    Odiado \= tiaAgatha.    
+odia(mayordomo, Odiado):-
+    vivenEnLaMansionDreadbury(Odiado),
+    Odiado \= tiaAgatha,
+    Odiado \= mayordomo.    
+odia(charles, Odiado):-
+    vivenEnLaMansionDreadbury(Odiado),
+    not(odia(tiaAgatha,Odiado)).
 %Quien mata es porque odia a su víctima y no es más rico que ella. Además, quien mata debe vivir en la mansión Dreadbury.
 mata(Asesino,Victima):-
-    odiadorOdiado(Asesino,Victima),
+    odia(Asesino,Victima),
     vivenEnLaMansionDreadbury(Asesino),
-    not(esMasRicoQueTiaAgatha(Asesino)).
+    not(esMasRicoQue(Victima,Asesino)).
+
 
 /* 1. El programa puede mostrar quien mato a Tia Agatha con la ultima consulta, mata(Asesino,Victima). Si hacemos la consulta como mata(Asesino,tiaAgatha),
 nos devuelve Asesino = charles.
