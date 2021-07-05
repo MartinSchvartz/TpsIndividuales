@@ -12,9 +12,7 @@ odia(tiaAgatha, Odiado):-
     Odiado \= mayordomo,
     Odiado \= tiaAgatha.    
 odia(mayordomo, Odiado):-
-    vivenEnLaMansionDreadbury(Odiado),
-    Odiado \= tiaAgatha,
-    Odiado \= mayordomo.    
+       odia(tiaAgatha,Odiado).    
 odia(charles, Odiado):-
     vivenEnLaMansionDreadbury(Odiado),
     not(odia(tiaAgatha,Odiado)).
